@@ -64,7 +64,7 @@ boolean CheckerDT_Node_isValid(Node_T oNNode) {
    parameter list to facilitate constructing your checks.
    If you do, you should update this function comment.
 */
-static boolean CheckerDT_treeCheck(Node_T oNNode) {
+static boolean CheckerDT_treeCheck(Node_T oNNode, size_t *pulVisited) {
    size_t ulIndex;
    Node_T oNPreviousChild;
 
@@ -76,6 +76,8 @@ static boolean CheckerDT_treeCheck(Node_T oNNode) {
       /* If not, pass that failure back up immediately */
       if(!CheckerDT_Node_isValid(oNNode))
          return FALSE;
+
+      (*pulVisited)++;
 
       /* Recur on every child of oNNode */
       for(ulIndex = 0; ulIndex < Node_getNumChildren(oNNode); ulIndex++) {
@@ -103,7 +105,7 @@ static boolean CheckerDT_treeCheck(Node_T oNNode) {
 
          /* if recurring down one subtree results in a failed check
             farther down, passes the failure back up immediately */
-         if(!CheckerDT_treeCheck(oNChild))
+         if(!CheckerDT_treeCheck(oNChild, pulVisited))
             return FALSE;
       }
    }
@@ -113,6 +115,11 @@ static boolean CheckerDT_treeCheck(Node_T oNNode) {
 /* see checkerDT.h for specification */
 boolean CheckerDT_isValid(boolean bIsInitialized, Node_T oNRoot,
                           size_t ulCount) {
+
+   // to keep track of how many have been visited
+   size_t ulVisited;
+
+   ulVisited = 0;
 
    /* Sample check on a top-level data structure invariant:
       if the DT is not initialized, its count should be 0. */
@@ -130,19 +137,23 @@ boolean CheckerDT_isValid(boolean bIsInitialized, Node_T oNRoot,
    }
 
    /* checks that the root does not have a parent */
-   if (oNRoot != NULL && (oNRoot) != NULL) {
+   if (oNRoot != NULL && Node_getParent(oNRoot) != NULL) {
       fprintf(stderr, "root node has a parent\n");
       return FALSE;
    }
 
+   /* Now checks invariants recursively at each node from the root. */
+   if (!CheckerDT_treeCheck(oNRoot, &ulVisited)) return FALSE;
+
+   // this also updates the value of the visited
+
    /* checks that the nodes that can be reached from the root is equal
       to the count */
-   if (Node_getNumChildren(oNRoot) != ulCount - 1) {
+   if (ulVisited != ulCount) {
       fprintf(stderr, "root node has %lu children but count is %lu\n",
-         Node_getNumChildren(oNRoot), ulCount);
+         ulVisited, ulCount);
       return FALSE;
    }
 
-   /* Now checks invariants recursively at each node from the root. */
-   return CheckerDT_treeCheck(oNRoot);
+   return TRUE;
 }
