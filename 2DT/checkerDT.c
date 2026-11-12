@@ -66,9 +66,9 @@ boolean CheckerDT_Node_isValid(Node_T oNNode) {
 */
 static boolean CheckerDT_treeCheck(Node_T oNNode, size_t *pulVisited) {
    size_t ulIndex;
-   /* Node_T oNPreviousChild; 
+   Node_T oNPreviousChild; 
 
-   oNPreviousChild = NULL; */
+   oNPreviousChild = NULL;
 
    if(oNNode!= NULL) {
 
@@ -107,6 +107,20 @@ static boolean CheckerDT_treeCheck(Node_T oNNode, size_t *pulVisited) {
             farther down, passes the failure back up immediately */
          if(!CheckerDT_treeCheck(oNChild, pulVisited))
             return FALSE;
+
+         /* checks to see if the sibling paths are increasing */
+         if (oNPreviousChild != NULL) {
+            char *pcPrevious = Path_getPathname(Node_getPath(oNPreviousChild));
+            char *pcCurrent = Path_getPathname(Node_getPath(oNChild));
+
+            if (strcmp(pcPrevious, pcCurrent) >= 0) {
+               fprintf(stderr, "sibling paths need to be increasing for these siblings: %s, %s\n",
+                  pcPrevious, pcCurrent);
+               return FALSE;
+            }
+         }
+
+         oNPreviousChild = oNChild;
       }
    }
    return TRUE;
