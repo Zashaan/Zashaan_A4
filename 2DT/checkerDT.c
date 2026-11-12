@@ -66,9 +66,9 @@ boolean CheckerDT_Node_isValid(Node_T oNNode) {
 */
 static boolean CheckerDT_treeCheck(Node_T oNNode, size_t *pulVisited) {
    size_t ulIndex;
-   Node_T oNPreviousChild;
+   /* Node_T oNPreviousChild; 
 
-   oNPreviousChild = NULL;
+   oNPreviousChild = NULL; */
 
    if(oNNode!= NULL) {
 
@@ -116,7 +116,7 @@ static boolean CheckerDT_treeCheck(Node_T oNNode, size_t *pulVisited) {
 boolean CheckerDT_isValid(boolean bIsInitialized, Node_T oNRoot,
                           size_t ulCount) {
 
-   // to keep track of how many have been visited
+   /* to keep track of how many have been visited */ 
    size_t ulVisited;
 
    ulVisited = 0;
