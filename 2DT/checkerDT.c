@@ -36,7 +36,7 @@ boolean CheckerDT_Node_isValid(Node_T oNNode) {
       ulDepthChild = Path_getDepth(oPNPath);
       ulDepthParent = Path_getDepth(oPPPath);
 
-      if((oPNPath, oPPPath) !=
+      if(Path_getSharedPrefixDepth(oPNPath, oPPPath) !=
          Path_getDepth(oPNPath) - 1) {
          fprintf(stderr, "P-C nodes don't have P-C paths: (%s) (%s)\n",
                  Path_getPathname(oPPPath), Path_getPathname(oPNPath));
@@ -46,7 +46,7 @@ boolean CheckerDT_Node_isValid(Node_T oNNode) {
       /* also checks that each child is one step deeper than their 
       parent */
       if (ulDepthChild == 0 || ulDepthParent != ulDepthChild - 1) {
-         printf(stderr, "parent depth is %zu but child depth is %zu",
+         fprintf(stderr, "parent depth is %zu but child depth is %zu\n",
             ulDepthParent, ulDepthChild);
          return FALSE;
       }
@@ -89,13 +89,14 @@ static boolean CheckerDT_treeCheck(Node_T oNNode) {
 
          /* checks that each of the children is not NULL */
          if (oNChild == NULL) {
-            printf(stderr, "child of index %zu is NULL", ulIndex);
+            fprintf(stderr, "child of index %zu is NULL\n", ulIndex);
             return FALSE;
          }
 
          /* checks that the parent of each child is correct */
          if (Node_getParent(oNChild) != oNNode) {
-            printf(stderr, "child of index %zu points to wrong parent",
+            fprintf(stderr, 
+               "child of index %zu points to wrong parent\n", 
                ulIndex);
             return FALSE;
          }
@@ -124,20 +125,20 @@ boolean CheckerDT_isValid(boolean bIsInitialized, Node_T oNRoot,
 
    /* check that if the tree has no root node then count is zero */
    if (oNRoot == NULL && ulCount != 0) {
-      printf(stderr, "tree has no root but count is %zu", ulCount);
+      fprintf(stderr, "tree has no root but count is %zu\n", ulCount);
       return FALSE;
    }
 
    /* checks that the root does not have a parent */
-   if (Node_getParent(oNRoot) != NULL) {
-      printf(stderr, "root node has a parent");
+   if (oNRoot != NULL && (oNRoot) != NULL) {
+      fprintf(stderr, "root node has a parent\n");
       return FALSE;
    }
 
    /* checks that the nodes that can be reached from the root is equal
       to the count */
    if (Node_getNumChildren(oNRoot) != ulCount - 1) {
-      printf(stderr, "root node has %zu children but count is %zu", 
+      fprintf(stderr, "root node has %zu children but count is %zu\n",
          Node_getNumChildren(oNRoot), ulCount);
       return FALSE;
    }
