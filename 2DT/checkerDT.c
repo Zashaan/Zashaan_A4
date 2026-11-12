@@ -110,8 +110,10 @@ static boolean CheckerDT_treeCheck(Node_T oNNode, size_t *pulVisited) {
 
          /* checks to see if the sibling paths are increasing */
          if (oNPreviousChild != NULL) {
-            char *pcPrevious = Path_getPathname(Node_getPath(oNPreviousChild));
-            char *pcCurrent = Path_getPathname(Node_getPath(oNChild));
+            const char *pcPrevious = 
+            Path_getPathname(Node_getPath(oNPreviousChild));
+            const char *pcCurrent = 
+            Path_getPathname(Node_getPath(oNChild));
 
             if (strcmp(pcPrevious, pcCurrent) >= 0) {
                fprintf(stderr, "sibling paths need to be increasing for these siblings: %s, %s\n",
