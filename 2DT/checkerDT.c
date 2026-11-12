@@ -46,7 +46,7 @@ boolean CheckerDT_Node_isValid(Node_T oNNode) {
       /* also checks that each child is one step deeper than their 
       parent */
       if (ulDepthChild == 0 || ulDepthParent != ulDepthChild - 1) {
-         fprintf(stderr, "parent depth is %s but child depth is %s\n",
+         fprintf(stderr, "parent depth is %u but child depth is %u\n",
             ulDepthParent, ulDepthChild);
          return FALSE;
       }
@@ -89,14 +89,14 @@ static boolean CheckerDT_treeCheck(Node_T oNNode) {
 
          /* checks that each of the children is not NULL */
          if (oNChild == NULL) {
-            fprintf(stderr, "child of index %s is NULL\n", ulIndex);
+            fprintf(stderr, "child of index %u is NULL\n", ulIndex);
             return FALSE;
          }
 
          /* checks that the parent of each child is correct */
          if (Node_getParent(oNChild) != oNNode) {
             fprintf(stderr, 
-               "child of index %s points to wrong parent\n", 
+               "child of index %u points to wrong parent\n", 
                ulIndex);
             return FALSE;
          }
@@ -125,7 +125,7 @@ boolean CheckerDT_isValid(boolean bIsInitialized, Node_T oNRoot,
 
    /* check that if the tree has no root node then count is zero */
    if (oNRoot == NULL && ulCount != 0) {
-      fprintf(stderr, "tree has no root but count is %s\n", ulCount);
+      fprintf(stderr, "tree has no root but count is %u\n", ulCount);
       return FALSE;
    }
 
@@ -138,7 +138,7 @@ boolean CheckerDT_isValid(boolean bIsInitialized, Node_T oNRoot,
    /* checks that the nodes that can be reached from the root is equal
       to the count */
    if (Node_getNumChildren(oNRoot) != ulCount - 1) {
-      fprintf(stderr, "root node has %s children but count is %s\n",
+      fprintf(stderr, "root node has %u children but count is %u\n",
          Node_getNumChildren(oNRoot), ulCount);
       return FALSE;
    }
