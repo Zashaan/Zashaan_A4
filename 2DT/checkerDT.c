@@ -28,13 +28,26 @@ boolean CheckerDT_Node_isValid(Node_T oNNode) {
       proper prefix of the node's path */
    oNParent = Node_getParent(oNNode);
    if(oNParent != NULL) {
+      size_t ulDepthChild;
+      size_t ulDepthParent;
+
       oPNPath = Node_getPath(oNNode);
       oPPPath = Node_getPath(oNParent);
+      ulDepthChild = Path_getDepth(oPNPath);
+      ulDepthParent = Path_getDepth(oPPPath);
 
-      if(Path_getSharedPrefixDepth(oPNPath, oPPPath) !=
+      if((oPNPath, oPPPath) !=
          Path_getDepth(oPNPath) - 1) {
          fprintf(stderr, "P-C nodes don't have P-C paths: (%s) (%s)\n",
                  Path_getPathname(oPPPath), Path_getPathname(oPNPath));
+         return FALSE;
+      }
+
+      /* also checks that each child is one step deeper than their 
+      parent */
+      if (ulDepthChild == 0 || ulDepthParent != ulDepthChild - 1) {
+         printf(stderr, "parent depth is %zu but child depth is %zu",
+            ulDepthParent, ulDepthChild);
          return FALSE;
       }
    }
@@ -53,6 +66,9 @@ boolean CheckerDT_Node_isValid(Node_T oNNode) {
 */
 static boolean CheckerDT_treeCheck(Node_T oNNode) {
    size_t ulIndex;
+   Node_T oNPreviousChild;
+
+   oNPreviousChild = NULL;
 
    if(oNNode!= NULL) {
 
@@ -62,13 +78,25 @@ static boolean CheckerDT_treeCheck(Node_T oNNode) {
          return FALSE;
 
       /* Recur on every child of oNNode */
-      for(ulIndex = 0; ulIndex < Node_getNumChildren(oNNode); ulIndex++)
-      {
+      for(ulIndex = 0; ulIndex < Node_getNumChildren(oNNode); ulIndex++) {
          Node_T oNChild = NULL;
          int iStatus = Node_getChild(oNNode, ulIndex, &oNChild);
 
          if(iStatus != SUCCESS) {
             fprintf(stderr, "getNumChildren claims more children than getChild returns\n");
+            return FALSE;
+         }
+
+         /* checks that each of the children is not NULL */
+         if (oNChild == NULL) {
+            printf(stderr, "child of index %zu is NULL", ulIndex);
+            return FALSE;
+         }
+
+         /* checks that the parent of each child is correct */
+         if (Node_getParent(oNChild) != oNNode) {
+            printf(stderr, "child of index %zu points to wrong parent",
+               ulIndex);
             return FALSE;
          }
 
@@ -92,6 +120,27 @@ boolean CheckerDT_isValid(boolean bIsInitialized, Node_T oNRoot,
          fprintf(stderr, "Not initialized, but count is not 0\n");
          return FALSE;
       }
+
+
+   /* check that if the tree has no root node then count is zero */
+   if (oNRoot == NULL && ulCount != 0) {
+      printf(stderr, "tree has no root but count is %zu", ulCount);
+      return FALSE;
+   }
+
+   /* checks that the root does not have a parent */
+   if (Node_getParent(oNRoot) != NULL) {
+      printf(stderr, "root node has a parent");
+      return FALSE;
+   }
+
+   /* checks that the nodes that can be reached from the root is equal
+      to the count */
+   if (Node_getNumChildren(oNRoot) != ulCount - 1) {
+      printf(stderr, "root node has %zu children but count is %zu", 
+         Node_getNumChildren(oNRoot), ulCount);
+      return FALSE;
+   }
 
    /* Now checks invariants recursively at each node from the root. */
    return CheckerDT_treeCheck(oNRoot);
