@@ -145,7 +145,7 @@ boolean CheckerDT_isValid(boolean bIsInitialized, Node_T oNRoot,
    /* Now checks invariants recursively at each node from the root. */
    if (!CheckerDT_treeCheck(oNRoot, &ulVisited)) return FALSE;
 
-   // this also updates the value of the visited
+   /* this also updates the value of the visited */ 
 
    /* checks that the nodes that can be reached from the root is equal
       to the count */
