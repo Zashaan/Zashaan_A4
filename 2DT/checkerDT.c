@@ -36,18 +36,17 @@ boolean CheckerDT_Node_isValid(Node_T oNNode) {
       ulDepthChild = Path_getDepth(oPNPath);
       ulDepthParent = Path_getDepth(oPPPath);
 
-      if(Path_getSharedPrefixDepth(oPNPath, oPPPath) !=
-         Path_getDepth(oPNPath) - 1) {
-         fprintf(stderr, "P-C nodes don't have P-C paths: (%s) (%s)\n",
-                 Path_getPathname(oPPPath), Path_getPathname(oPNPath));
-         return FALSE;
-      }
-
-      /* also checks that each child is one step deeper than their 
-      parent */
+      /* checks that each child is one step deeper than their parent */
       if (ulDepthChild == 0 || ulDepthParent != ulDepthChild - 1) {
          fprintf(stderr, "parent depth is %lu but child depth is %lu\n",
             ulDepthParent, ulDepthChild);
+         return FALSE;
+      }
+
+      if(Path_getSharedPrefixDepth(oPNPath, oPPPath) !=
+         ulDepthParent) {
+         fprintf(stderr, "P-C nodes don't have P-C paths: (%s) (%s)\n",
+                 Path_getPathname(oPPPath), Path_getPathname(oPNPath));
          return FALSE;
       }
    }
@@ -77,6 +76,7 @@ static boolean CheckerDT_treeCheck(Node_T oNNode, size_t *pulVisited) {
       if(!CheckerDT_Node_isValid(oNNode))
          return FALSE;
 
+      /* increases the value for every node visited*/
       (*pulVisited)++;
 
       /* Recur on every child of oNNode */
@@ -164,7 +164,7 @@ boolean CheckerDT_isValid(boolean bIsInitialized, Node_T oNRoot,
    /* checks that the nodes that can be reached from the root is equal
       to the count */
    if (ulVisited != ulCount) {
-      fprintf(stderr, "root node has %lu children but count is %lu\n",
+      fprintf(stderr, "visited %lu nodes but the count is %lu\n",
          ulVisited, ulCount);
       return FALSE;
    }
