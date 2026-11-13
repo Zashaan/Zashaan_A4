@@ -258,6 +258,7 @@ Node_T Node_getParent(Node_T oNNode) {
 
 void *Node_getContents(Node_T oNNode) {
    assert(oNNode != NULL);
+   assert(Node_isFile(oNNode));
 
    return oNNode->pvContents;
 }

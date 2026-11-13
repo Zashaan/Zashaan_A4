@@ -49,7 +49,6 @@ int FT_insertDir(const char *pcPath) {
     Node_T oNCurr = NULL;
     size_t ulDepth, ulIndex;
     size_t ulNewNodes = 0;
-    size_t ulSize = 0;
     size_t i;
     size_t ulChildID;
 
@@ -157,12 +156,14 @@ int FT_insertDir(const char *pcPath) {
 */
 boolean FT_containsDir(const char *pcPath) {
    int iStatus;
-   Node_T oNFound = NULL;
+   size_t ulSize;
+   boolean bFile;
 
    assert(pcPath != NULL);
 
-   iStatus = DT_findNode(pcPath, &oNFound);
-   return (boolean) (iStatus == SUCCESS);
+   iStatus = FT_stat(pcPath, &bFile, &ulSize);
+   if (iStatus != SUCCESS) return FALSE;
+   return !bFile;
 }
 
 /*--------------------------------------------------------------------*/
@@ -267,7 +268,6 @@ int FT_insertFile(const char *pcPath, void *pvContents,
     Node_T oNCurr = NULL;
     size_t ulDepth, ulIndex;
     size_t ulNewNodes = 0;
-    size_t ulSize = 0;
     size_t i;
     size_t ulChildID;
 
@@ -379,12 +379,14 @@ int FT_insertFile(const char *pcPath, void *pvContents,
 */
 boolean FT_containsFile(const char *pcPath) {
     int iStatus;
-    Node_T oNFound = NULL;
+    size_t ulSize;
+    boolean bFile;
 
     assert(pcPath != NULL);
 
-    iStatus = DT_findNode(pcPath, &oNFound);
-    return (boolean) (iStatus == SUCCESS);
+    iStatus = FT_stat(pcPath, &bFile, &ulSize);
+    if (iStatus != SUCCESS) return FALSE;
+    return bFile;
 }
 
 /*--------------------------------------------------------------------*/
@@ -804,7 +806,7 @@ char *FT_toString(void) {
         DynArray_free(oDNodes);
         return NULL;
     }
-    pcReturnEditor = pcReturnEditor + ulTotalSize + 1;
+    pcReturnEditor = pcReturnString + ulTotalSize + 1;
     *pcReturnEditor = '\0';
     pcReturnEditor = pcReturnString;
 
@@ -812,7 +814,7 @@ char *FT_toString(void) {
     for(i = 0; i < ulVisited; i++) {
         oNCurrent = DynArray_get(oDNodes, i);
         strcat(pcReturnEditor, Path_getPathname(Node_getPath(oNCurrent)));
-        strcat(pcReturnEditor, '\n');
+        strcat(pcReturnEditor, "\n");
     }
     DynArray_free(oDNodes);
     return pcReturnString;

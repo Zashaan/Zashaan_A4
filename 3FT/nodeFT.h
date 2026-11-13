@@ -73,9 +73,6 @@ int Node_getChild(Node_T oNParent, size_t ulChildID,
 */
 Node_T Node_getParent(Node_T oNNode);
 
-/* returns the pointer to the contents of oNNode */
-void *Node_getContents(Node_T oNNode);
-
 /* returns the value of the size of the contents of oNNode */
 size_t Node_getSize(Node_T oNNode);
 
