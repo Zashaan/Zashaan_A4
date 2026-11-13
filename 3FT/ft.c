@@ -50,7 +50,7 @@ int FT_insertDir(const char *pcPath) {
     size_t ulDepth, ulIndex;
     size_t ulNewNodes = 0;
     size_t i;
-    size_t ulChildID;
+    size_t ulChildID = 0;
 
     assert(pcPath != NULL);
 
@@ -157,7 +157,7 @@ int FT_insertDir(const char *pcPath) {
 boolean FT_containsDir(const char *pcPath) {
    int iStatus;
    size_t ulSize;
-   boolean bFile;
+    boolean bFile = FALSE;
 
    assert(pcPath != NULL);
 
@@ -184,7 +184,7 @@ int FT_rmDir(const char *pcPath) {
     Path_T oPPath = NULL;
     Node_T oNFound = NULL;
     size_t i;
-    size_t ulChildID;
+    size_t ulChildID = 0;
 
     assert(pcPath != NULL);
 
@@ -269,7 +269,7 @@ int FT_insertFile(const char *pcPath, void *pvContents,
     size_t ulDepth, ulIndex;
     size_t ulNewNodes = 0;
     size_t i;
-    size_t ulChildID;
+    size_t ulChildID = 0;
 
     assert(pcPath != NULL);
 
@@ -349,7 +349,7 @@ int FT_insertFile(const char *pcPath, void *pvContents,
 
         /* insert the new node for this level */
         iStatus = Node_new(oPPrefix, oNCurr, &oNNewNode, 
-            ulIndex == ulDepth);
+            (ulIndex == ulDepth));
         if(iStatus != SUCCESS) {
             Path_free(oPPath);
             Path_free(oPPrefix);
@@ -366,7 +366,7 @@ int FT_insertFile(const char *pcPath, void *pvContents,
     }
 
     /* replaces the contents now */
-    Node_replaceContents(oNCurr, pvContents, ulLength);
+    (void) Node_replaceContents(oNCurr, pvContents, ulLength);
 
     Path_free(oPPath);
     /* update FT state variables to reflect insertion */
@@ -386,7 +386,7 @@ int FT_insertFile(const char *pcPath, void *pvContents,
 boolean FT_containsFile(const char *pcPath) {
     int iStatus;
     size_t ulSize;
-    boolean bFile;
+    boolean bFile = FALSE;
 
     assert(pcPath != NULL);
 
@@ -413,7 +413,7 @@ int FT_rmFile(const char *pcPath) {
     Path_T oPPath = NULL;
     Node_T oNFound = NULL;
     size_t i;
-    size_t ulChildID;
+    size_t ulChildID = 0;
 
     assert(pcPath != NULL);
 
@@ -488,7 +488,7 @@ void *FT_getFileContents(const char *pcPath) {
     Path_T oPPath = NULL;
     Node_T oNFound = NULL;
     size_t i;
-    size_t ulChildID;
+    size_t ulChildID = 0;
 
     assert(pcPath != NULL);
 
@@ -559,7 +559,7 @@ void *FT_replaceFileContents(const char *pcPath, void *pvNewContents,
     Path_T oPPath = NULL;
     Node_T oNFound = NULL;
     size_t i;
-    size_t ulChildID;
+    size_t ulChildID = 0;
 
     assert(pcPath != NULL);
 
@@ -639,7 +639,7 @@ int FT_stat(const char *pcPath, boolean *pbIsFile, size_t *pulSize) {
     Path_T oPPath = NULL;
     Node_T oNFound = NULL;
     size_t i;
-    size_t ulChildID;
+    size_t ulChildID = 0;
 
     assert(pcPath != NULL);
     assert(pbIsFile != NULL);
@@ -727,7 +727,7 @@ int FT_init(void) {
 */
 int FT_destroy(void) {
     if(!bIsInitialized) return INITIALIZATION_ERROR;
-    if(oNRoot != NULL) Node_free(oNRoot);
+    if(oNRoot != NULL) (void) Node_free(oNRoot);
     oNRoot = NULL;
     ulCount = 0;
     bIsInitialized = FALSE;
@@ -752,7 +752,7 @@ char *FT_toString(void) {
     DynArray_T oDToDo;
     DynArray_T oDNodes;
     Node_T oNCurrent;
-    Node_T oNChild;
+    Node_T oNChild = NULL;
     int iStatus;
     char *pcReturnString;
     size_t i;
@@ -771,7 +771,7 @@ char *FT_toString(void) {
         return NULL;
     }
     if(oNRoot != NULL) {
-        DynArray_set(oDToDo, ulRemaining, oNRoot);
+        (void) DynArray_set(oDToDo, ulRemaining, oNRoot);
         ulRemaining++;
     }
 
@@ -780,7 +780,7 @@ char *FT_toString(void) {
         /* remove last node and record what it is */
         ulRemaining--;
         oNCurrent = DynArray_get(oDToDo, ulRemaining);
-        DynArray_set(oDNodes, ulVisited, oNCurrent);
+        (void) DynArray_set(oDNodes, ulVisited, oNCurrent);
         ulVisited++;
         ulTotalSize += Path_getStrLength(Node_getPath(oNCurrent)) + 1;
 
@@ -791,7 +791,7 @@ char *FT_toString(void) {
             iStatus = Node_getChild(oNCurrent, i - 1, &oNChild);
             assert(iStatus == SUCCESS);
             if(!Node_isFile(oNChild)) {
-                DynArray_set(oDToDo, ulRemaining, oNChild);
+                (void) DynArray_set(oDToDo, ulRemaining, oNChild);
                 ulRemaining++;
             }
         }
@@ -799,7 +799,7 @@ char *FT_toString(void) {
             iStatus = Node_getChild(oNCurrent, i - 1, &oNChild);
             assert(iStatus == SUCCESS);
             if(Node_isFile(oNChild)) {
-                DynArray_set(oDToDo, ulRemaining, oNChild);
+                (void) DynArray_set(oDToDo, ulRemaining, oNChild);
                 ulRemaining++;
             }
         }
