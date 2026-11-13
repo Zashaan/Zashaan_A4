@@ -256,13 +256,6 @@ Node_T Node_getParent(Node_T oNNode) {
    return oNNode->oNParent;
 }
 
-void *Node_getContents(Node_T oNNode) {
-   assert(oNNode != NULL);
-   assert(Node_isFile(oNNode));
-
-   return oNNode->pvContents;
-}
-
 size_t Node_getSize(Node_T oNNode) {
    assert(oNNode != NULL);
 
