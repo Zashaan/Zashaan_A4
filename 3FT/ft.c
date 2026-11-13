@@ -11,8 +11,7 @@
 
 #include "dynarray.h"
 #include "path.h"
-#include "nodeDT.h"
-#include "checkerDT.h"
+#include "nodeFT.h"
 #include "ft.h"
 
 /*--------------------------------------------------------------------*/
@@ -126,7 +125,7 @@ int FT_insertDir(const char *pcPath) {
         }
 
         /* insert the new node for this level */
-        iStatus = Node_new(oPPrefix, oNCurr, &oNNewNode);
+        iStatus = Node_new(oPPrefix, oNCurr, &oNNewNode, FALSE);
         if(iStatus != SUCCESS) {
             Path_free(oPPath);
             Path_free(oPPrefix);
@@ -345,7 +344,7 @@ int FT_insertFile(const char *pcPath, void *pvContents,
         }
 
         /* insert the new node for this level */
-        iStatus = Node_new(oPPrefix, oNCurr, &oNNewNode);
+        iStatus = Node_new(oPPrefix, oNCurr, &oNNewNode, TRUE);
         if(iStatus != SUCCESS) {
             Path_free(oPPath);
             Path_free(oPPrefix);
