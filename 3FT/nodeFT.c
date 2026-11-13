@@ -160,10 +160,11 @@ int Node_new(Path_T oPPath, Node_T oNParent, Node_T *poNResult, boolean bFile) {
    if(oNParent != NULL) {
       iStatus = Node_addChild(oNParent, psNew, ulIndex);
       if(iStatus != SUCCESS) {
-         Path_free(psNew->oPPath);
-         free(psNew);
-         *poNResult = NULL;
-         return iStatus;
+        DynArray_free(psNew->oDChildren);
+        Path_free(psNew->oPPath);
+        free(psNew);
+        *poNResult = NULL;
+        return iStatus;
       }
    }
 

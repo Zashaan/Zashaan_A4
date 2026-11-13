@@ -223,7 +223,7 @@ int FT_rmDir(const char *pcPath) {
             if(!Node_hasChild(oNFound, oPPrefix, &ulChildID)) {
                 Path_free(oPPrefix);
                 Path_free(oPPath);
-                break;
+                return NO_SUCH_PATH;
             }
             Path_free(oPPrefix);
             iStatus = Node_getChild(oNFound, ulChildID, &oNChild);
@@ -313,6 +313,10 @@ int FT_insertFile(const char *pcPath, void *pvContents,
     }
 
     ulDepth = Path_getDepth(oPPath);
+    if (oNCurr == NULL && ulDepth == 1) {
+        Path_free(oPPath);
+        return CONFLICTING_PATH;
+    }
     if(oNCurr == NULL) /* new root! */
         ulIndex = 1;
     else {
@@ -344,7 +348,8 @@ int FT_insertFile(const char *pcPath, void *pvContents,
         }
 
         /* insert the new node for this level */
-        iStatus = Node_new(oPPrefix, oNCurr, &oNNewNode, TRUE);
+        iStatus = Node_new(oPPrefix, oNCurr, &oNNewNode, 
+            ulIndex == ulDepth);
         if(iStatus != SUCCESS) {
             Path_free(oPPath);
             Path_free(oPPrefix);
@@ -360,7 +365,8 @@ int FT_insertFile(const char *pcPath, void *pvContents,
         ulIndex++;
     }
 
-    /* add the replace contents thing here */
+    /* replaces the contents now */
+    Node_replaceContents(oNCurr, pvContents, ulLength);
 
     Path_free(oPPath);
     /* update FT state variables to reflect insertion */
@@ -446,7 +452,7 @@ int FT_rmFile(const char *pcPath) {
             if(!Node_hasChild(oNFound, oPPrefix, &ulChildID)) {
                 Path_free(oPPrefix);
                 Path_free(oPPath);
-                break;
+                return NO_SUCH_PATH;
             }
             Path_free(oPPrefix);
             iStatus = Node_getChild(oNFound, ulChildID, &oNChild);
@@ -521,7 +527,7 @@ void *FT_getFileContents(const char *pcPath) {
             if(!Node_hasChild(oNFound, oPPrefix, &ulChildID)) {
                 Path_free(oPPrefix);
                 Path_free(oPPath);
-                break;
+                return NULL;
             }
             Path_free(oPPrefix);
             iStatus = Node_getChild(oNFound, ulChildID, &oNChild);
@@ -592,7 +598,7 @@ void *FT_replaceFileContents(const char *pcPath, void *pvNewContents,
             if(!Node_hasChild(oNFound, oPPrefix, &ulChildID)) {
                 Path_free(oPPrefix);
                 Path_free(oPPath);
-                break;
+                return NULL;
             }
             Path_free(oPPrefix);
             iStatus = Node_getChild(oNFound, ulChildID, &oNChild);
@@ -749,7 +755,6 @@ char *FT_toString(void) {
     Node_T oNChild;
     int iStatus;
     char *pcReturnString;
-    char *pcReturnEditor;
     size_t i;
     size_t ulVisited = 0;
     size_t ulRemaining = 0;
@@ -777,7 +782,7 @@ char *FT_toString(void) {
         oNCurrent = DynArray_get(oDToDo, ulRemaining);
         DynArray_set(oDNodes, ulVisited, oNCurrent);
         ulVisited++;
-        ulTotalSize += Path_getStrLength(Node_getPath(oNCurrent));
+        ulTotalSize += Path_getStrLength(Node_getPath(oNCurrent)) + 1;
 
         /* does the directories in reverse order and then files in
            reverse and then assembles the correct order by finishing
@@ -799,24 +804,31 @@ char *FT_toString(void) {
             }
         }
     }
+
+    /* frees once done with the ToDo array */
     DynArray_free(oDToDo);
 
+    /* gives the space in memory to the return string */
     pcReturnString = malloc(ulTotalSize + 1);
     if(pcReturnString == NULL) {
         DynArray_free(oDNodes);
         return NULL;
     }
-    pcReturnEditor = pcReturnString + ulTotalSize + 1;
-    *pcReturnEditor = '\0';
-    pcReturnEditor = pcReturnString;
+
+    /* starts with an empty string */
+    pcReturnString[0] = '\0';
 
     /* goes through and actually populates the string now */
     for(i = 0; i < ulVisited; i++) {
         oNCurrent = DynArray_get(oDNodes, i);
-        strcat(pcReturnEditor, Path_getPathname(Node_getPath(oNCurrent)));
-        strcat(pcReturnEditor, "\n");
+        strcat(pcReturnString, Path_getPathname(Node_getPath(oNCurrent)));
+        strcat(pcReturnString, "\n");
     }
+
+    /* once done with the nodes, can free it now */
     DynArray_free(oDNodes);
+
+    /* returns the return string */
     return pcReturnString;
 }
 

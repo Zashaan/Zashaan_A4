@@ -1,6 +1,6 @@
 all: ft
 
-ft: ft.o nodeFT.o dynarray.o path.o
+ft: ft.o nodeFT.o dynarray.o path.o ft_client.o
 	gcc217 ft.o nodeFT.o dynarray.o path.o ft_client.o -o ft
 
 ft.o: ft.c ft.h nodeFT.h dynarray.h path.h a4def.h
@@ -19,4 +19,4 @@ ft_client.o: ft_client.c ft.h a4def.h
 	gcc217 -c ft_client.c
 
 clean:
-	rm -f ft ft.o nodeFT.o path.o dynarray.o
+	rm -f ft ft.o nodeFT.o path.o dynarray.o ft_client.o
